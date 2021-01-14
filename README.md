@@ -3,6 +3,19 @@
 ## Overview
 This project is designed to produce a defensive shift for a given set of batted balls. It assumes that the distribution of previous batted balls is a good predictor of the distribution of future batted balls. In order to produce a shift, it combines iterations of gradient descent and a clustering algorithm.
 
+## Running the Code
+To run the code, the command must follow the syntax: 
+
+`python shift.py BATTER_NAME [{-y | --year} START_YEAR [NUM_YEARS]]`
+
+where:
+- `BATTER_NAME` is the batter's name in the format: `LAST_NAME,FIRST_NAME` (no space on either side of the comma, spaces in a player's name are fine)
+- `START_YEAR` is the first year from which to collect data
+- `NUM_YEARS` is the number of years, including the first year, from which to collect data
+
+## Examples
+### [Find examples here](./index.html)
+
 ## Gradient Descent
 [Gradient Descent](https://en.wikipedia.org/wiki/Gradient_descent) is a method of finding a minimum of a function. In order to use this method, we need to define a function *f(P;B)* such that *P* is the set of player coordinates and *B* is the set of all batted balls. This function will use a variation of [wOBA](https://library.fangraphs.com/offense/woba/) to determine the total value produced by the batted balls given the fielders' locations. By applying gradient descent to this function, the fielders' location will move to spots where they can minimize the batter's wOBA.
 
