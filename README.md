@@ -9,9 +9,11 @@ To run the code, the command must follow the syntax:
 `python shift.py BATTER_NAME [{-y | --year} START_YEAR [NUM_YEARS]]`
 
 where:
-- `BATTER_NAME` is the batter's name in the format: `LAST_NAME,FIRST_NAME` (no space on either side of the comma, spaces in a player's name are fine)
+- `BATTER_NAME` is the batter's name in the format: `LAST_NAME,FIRST_NAME` (no space on either side of the comma, spaces in a player's name are fine: e.g. `La Stella,Tommy`)
 - `START_YEAR` is the first year from which to collect data
 - `NUM_YEARS` is the number of years, including the first year, from which to collect data
+
+To change the fielders' parameters, edit `players.json`.
 
 ## Examples
 ### [Find examples here](./index.html)
