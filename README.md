@@ -16,7 +16,7 @@ where:
 To change the fielders' parameters, edit `players.json`.
 
 ## Examples
-### [Find examples here](./index.html)
+### [Find examples here](https://mccapobianco.github.io/ShiftGenerator/)
 
 ## Gradient Descent
 [Gradient Descent](https://en.wikipedia.org/wiki/Gradient_descent) is a method of finding a minimum of a function. In order to use this method, we need to define a function *f(P;B)* such that *P* is the set of player coordinates and *B* is the set of all batted balls. This function will use a variation of [wOBA](https://library.fangraphs.com/offense/woba/) to determine the total value produced by the batted balls given the fielders' locations. By applying gradient descent to this function, the fielders' location will move to spots where they can minimize the batter's wOBA.
