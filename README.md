@@ -1,4 +1,4 @@
-# :baseball: Automatically Generating Shifts for Baseball Batters :baseball:
+# :baseball: Auto-Generated Shifts for Baseball Batters :baseball:
 
 ## Overview
 This project is designed to produce a defensive shift for a given set of batted balls. It assumes that the distribution of previous batted balls is a good predictor of the distribution of future batted balls. In order to produce a shift, it combines iterations of gradient descent and a clustering algorithm.
@@ -13,7 +13,7 @@ where:
 - `START_YEAR` is the first year from which to collect data
 - `NUM_YEARS` is the number of years, including the first year, from which to collect data
 
-To change the fielders' parameters, edit `players.json`.
+To change the fielders' parameters, edit `fielders.json`.
 
 ## Examples
 ### [Find examples here](https://mccapobianco.github.io/ShiftGenerator/)
