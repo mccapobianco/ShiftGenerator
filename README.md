@@ -1,4 +1,4 @@
-# Automatically Generating Shifts for Baseball Batters
+# :baseball: Automatically Generating Shifts for Baseball Batters :baseball:
 
 ## Overview
 This project is designed to produce a defensive shift for a given set of batted balls. It assumes that the distribution of previous batted balls is a good predictor of the distribution of future batted balls. In order to produce a shift, it combines iterations of gradient descent and a clustering algorithm.
