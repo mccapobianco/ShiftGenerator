@@ -132,6 +132,64 @@ def evaluate_on_hit(hit):
 			closest = [np.argmin([tf.norm(player['loc']-hit_coord) for player in fielders])+1]
 	return value, list(set(closest))
 
+def evaluate_on_hit_discrete(hit):
+	launch_angle = hit['launch_angle']
+	exit_velocity = hit['exit_velocity']
+	hit_coord = hit['hit_coord']
+	batter = hit['batter']
+	weight = hit['weight']
+	hangtime = hit['hangtime']
+	h_lambda = hit['height']
+	value = 1.0
+
+	hc_x, hc_y = hit_coord
+	dir_rad = tf.math.atan(hc_x/hc_y)
+	la_rad = launch_angle*math.pi/180
+	hit_slope = hc_y/hc_x
+	ev_vert = exit_velocity*tf.math.sin(la_rad)
+	ev_horz = exit_velocity*tf.math.cos(la_rad)
+	for player in fielders:
+		v = 5280/3600*ev_horz # ft/s
+		s = 5280/3600*player['speed'] # ft/s
+		#use quadratic formula to find fastest time to ball
+		vx = v * tf.math.sin(dir_rad)
+		vy = v * tf.math.cos(dir_rad)
+		a = v**2 - s**2
+		b = -2*player['loc'][0]*vx - 2*player['loc'][1]*vy
+		c = tf.norm(player['loc'])**2
+		disc = b**2-4*a*c #discriminant
+		if disc < 0:
+			continue
+		t = (-b - tf.math.sqrt(disc)) / (2*a)
+		t += player['reaction_time']
+		#get trajectory info
+		t_height = h_lambda(t)
+		#if negative, groundball
+		if  t>0 and t_height < 0:
+			dist_home = v*t
+			dist_first = tf.math.sqrt(90**2+dist_home**2-2*90*dist_home*tf.math.cos(math.pi/4-dir_rad)) #law of cosines
+			t_gather = 0.5
+			t_throw = dist_first/(5280/3600*player['throw_speed'])
+			if batter['t_first'] > t+t_gather+t_throw:
+				return 0
+		#flyball/line drive
+		else:
+			#line drive
+			if player['v_reach'] > t_height:
+				return 0
+			#fly ball
+			time_to_spot = player['reaction_time'] + tf.norm(player['loc']-[hc_x, hc_y]) / s
+			if hangtime > time_to_spot:
+				return 0
+	return 1
+
+def evaluate_alignment(batted_balls):
+	value = 0
+	for ball in batted_balls:
+		value += (evaluate_on_hit_discrete(ball) * ball['weight'])
+	return value / len(batted_balls)
+
+
 def gradient_descent(batted_balls, epochs=10, if_lr=1e4, of_lr=1e4, decay=0, display=False): #TODO verbose setting
 	print('Starting gradient descent.')
 	for epoch in range(epochs):
@@ -229,32 +287,16 @@ if __name__ == '__main__':
 	hit_dots = [hit['hit_coord'] for hit in data]
 	# print('Starting gradient descent for', name[1], name[0])
 
+	standard_value = evaluate_alignment(data)
 	for _ in range(5):
 		centroid_adjust(data, epochs=10, weight=1/2)
-		# player_dots = [tuple(player['loc'].numpy()) for player in fielders]
-		# draw_field(330, 420, players=player_dots, balls=hit_dots,title=f'Generated shift for {name[1]} {name[0]}'.upper())
 		gradient_descent(data, epochs=5, if_lr=1e4, of_lr=1e4, display=False)
 	gradient_descent(data, epochs=15, if_lr=1e4, of_lr=1e4, display=False)
-	# centroid_adjust(data, epochs=1, weight=1)
-	# gradient_descent(data, epochs=1, if_lr=1e4, of_lr=1e4, display=False)
 	player_dots = [tuple(player['loc'].numpy()) for player in fielders]
+	shifted_value = evaluate_alignment(data)
 	print(player_dots)
-	# ball_colors = []
-	# hitstr = []
-	# for ball in data:
-	# 	value, closest = evaluate_on_hit(ball)
-	# 	if len(closest) > 1:
-	# 		ball_colors.append('black')
-	# 	else:
-	# 		colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink']
-	# 		ball_colors.append(colors[closest[0]-3])
-	# 	d = ball
-	# 	d['Color'] = colors[closest[0]-3]
-	# 	d['hangtime'] = float(d['hangtime'].numpy())
-	# 	d.pop('height', None)
-	# 	d.pop('batter', None)
-	# 	hitstr.append(str(d))
-	# with open('hits.txt', 'w') as f:
-	# 	f.write('\n'.join(hitstr))
+	print('Standard Value', standard_value)
+	print('Shifed Value', shifted_value)
 	draw_field(330, 420, players=player_dots, balls=hit_dots,title=f'Generated shift for {name[1]} {name[0]}'.upper())
+
 
